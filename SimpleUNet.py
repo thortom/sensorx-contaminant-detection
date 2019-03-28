@@ -8,7 +8,7 @@ from fastai.vision import *
 from fastai.callbacks.hooks import *
 import matplotlib.pyplot as plt
 
-path = Path('C:/School/Scripts/BonesPngImages_copy') # TODO: Test using wild card to catch only the images not the masks
+path = Path('C:/School/Scripts/out/') # TODO: Test using wild card to catch only the images not the masks
                                                      #          or just move the masks to different folder
 
 path.ls()
@@ -21,10 +21,11 @@ img = open_image(img_f)
 img.show(figsize=(5,5))
 plt.show()
 
-def get_y_fn(x): return Path(str(x.parent)+'annot')/x.name
+def get_y_fn(x):
+    print(str(x.parent))
+    return Path(str(x.parent)+'/annot') / x.name
 
-codes = array(['Sky', 'Building', 'Pole', 'Road', 'Sidewalk', 'Tree',
-    'Sign', 'Fence', 'Car', 'Pedestrian', 'Cyclist', 'Void'])
+codes = array(['Belt', 'Meat', 'Bone', 'Metal'])
 
 mask = open_mask(get_y_fn(img_f))
 mask.show(figsize=(5,5), alpha=1)

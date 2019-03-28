@@ -43,7 +43,7 @@ for i = 1 : length(images)
 
     % metalMaskImg(metalMaskImg ~= 0)
 
-    baseFilename = ['C:\School\Scripts\out\', settings.archiveImg.name];
+    basePath = ['C:\School\Scripts\out\'];
     %imwrite(plastImg, [baseFilename, '_plastic.png'],'png');
     %imwrite(alImg, [baseFilename, '_aluminium.png'],'png');
     %imwrite(lowImg, [baseFilename, '_low.png'],'png');
@@ -53,11 +53,11 @@ for i = 1 : length(images)
     % the image if the metal is really metal
 %     lowImg = lowImg * 255/max(lowImg, [], 'all');
 %     highImg = highImg * 255/max(highImg, [], 'all');
-    imwrite(lowImg, [baseFilename, '_low.png'],'png');
-    imwrite(highImg, [baseFilename, '_high.png'],'png');
+    %imwrite(lowImg, [baseFilename, '_low.png'],'png');
+    imwrite(highImg, [basePath, settings.archiveImg.name, '_high.png'],'png');
     %imwrite(imageResults.lowImgNormReg, [baseFilename,'_lowImgNormReg.png'],'png');
     %imwrite(imageResults.highImgNorm, [baseFilename,'_highImgNorm.png'],'png');
-    imwrite(mask, [baseFilename, '_masks.png'],'png');
+    imwrite(mask, [basePath, 'annot\', settings.archiveImg.name, '_masks.png'],'png');
 
     %imwrite(productMaskImg, [baseFilename, '_productMask.png'],'png');
     %imwrite(boneMaskImg, [baseFilename, '_boneMask.png'],'png');
