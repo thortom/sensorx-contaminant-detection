@@ -2,8 +2,8 @@ clc; close all; clear all;
 
 path(path,'C:\Work\GIT\testscripts\');
 
-settings.archiveImg.path = 'C:\School\Scripts\13mars_copy\MetalImages_13mars\';
-settings.calData.path = 'C:\School\Scripts\13mars_copy\calibration_data_13mar19\';
+settings.archiveImg.path = 'C:\School\Myndir\Spruce_20190328\0630\';
+settings.calData.path = 'C:\School\Myndir\Spruce_20190328\calibration_data\';
 settings.boneDetection.angle = 91.32;
 settings.boneDetection.metalThreshold = 1200;
 settings.boneDetection.volumeThreshold = 50;
@@ -25,7 +25,7 @@ for i = 1 : length(images)
     bonesDetected = countDefects(boneMask);
     metalDetected = countDefects(metalMask);
 
-    settings.archiveImg.name, bonesDetected, metalDetected;
+    settings.archiveImg.name, bonesDetected, metalDetected
     
     plastImg = uint8(imageResults.plasticImg)*(255/20);
     alImg = uint8(imageResults.alImg)*(255/1);
@@ -33,9 +33,9 @@ for i = 1 : length(images)
     highImg = imageResults.highImgNorm;%*255;
 
     mask = uint8(zeros(size(plastImg)));
-    mask(imageResults.maskImg ~= 0) = uint8(imageResults.maskImg(imageResults.maskImg ~= 0))*(255/3*1);
-    mask(boneMask ~= 0) = uint8(boneMask(boneMask ~= 0))*(255/3*2);
-    mask(metalMask ~= 0) = uint8(metalMask(metalMask ~= 0))*(255/3*3);
+    mask(imageResults.maskImg ~= 0) = uint8(1);%uint8(imageResults.maskImg(imageResults.maskImg ~= 0))*(255/3*1);
+    mask(boneMask ~= 0) = uint8(2);%uint8(boneMask(boneMask ~= 0))*(255/3*2);
+    mask(metalMask ~= 0) = uint8(3);%uint8(metalMask(metalMask ~= 0))*(255/3*3);
 
     productMaskImg = uint8(imageResults.maskImg)*255;
     boneMaskImg = uint8(boneMask)*255;
@@ -53,11 +53,20 @@ for i = 1 : length(images)
     % the image if the metal is really metal
 %     lowImg = lowImg * 255/max(lowImg, [], 'all');
 %     highImg = highImg * 255/max(highImg, [], 'all');
+
+    % %% Load SX Image, contains both low and high energy images
+    % sxImg = double(imread(fullfile(settings.archiveImg.path, settings.archiveImg.name)));
+    % [sxImgLength, sxImgWidth] = size(sxImg);
+    % imwrite(sxImg, [basePath, settings.archiveImg.name, '.png'],'png');
     %imwrite(lowImg, [baseFilename, '_low.png'],'png');
-    imwrite(highImg, [basePath, settings.archiveImg.name, '_high.png'],'png');
+    [width, height] = size(highImg);
+    paddedHighImg = padarray(highImg,[(700-width)/2 (768-height)/2],255,'both');
+    imwrite(paddedHighImg, [basePath, 'images\', settings.archiveImg.name],'png');
     %imwrite(imageResults.lowImgNormReg, [baseFilename,'_lowImgNormReg.png'],'png');
     %imwrite(imageResults.highImgNorm, [baseFilename,'_highImgNorm.png'],'png');
-    imwrite(mask, [basePath, 'annot\', settings.archiveImg.name, '_masks.png'],'png');
+    [width, height] = size(mask);
+    paddedMask = padarray(mask,[(700-width)/2 (768-height)/2],0,'both');
+    imwrite(paddedMask, [basePath, 'masks\', settings.archiveImg.name],'png');
 
     %imwrite(productMaskImg, [baseFilename, '_productMask.png'],'png');
     %imwrite(boneMaskImg, [baseFilename, '_boneMask.png'],'png');

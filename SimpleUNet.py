@@ -23,7 +23,7 @@ plt.show()
 
 def get_y_fn(x):
     print(str(x.parent))
-    return Path(str(x.parent)+'/annot') / x.name
+    return Path(str(x.parent)+'/masks') / x.name
 
 codes = array(['Belt', 'Meat', 'Bone', 'Metal'])
 
@@ -35,7 +35,7 @@ src_size = np.array(mask.shape[1:])
 print(src_size, mask.data)
 
 ## Datasets
-bs,size = 8,src_size//2
+bs,size = 2,src_size//2
 
 src = (SegmentationItemList.from_folder(path)
        .split_by_folder(valid='val')
