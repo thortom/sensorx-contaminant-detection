@@ -33,9 +33,9 @@ for i = 1 : length(images)
     highImg = imageResults.highImgNorm;%*255;
 
     mask = uint8(zeros(size(plastImg)));
-    mask(imageResults.maskImg ~= 0) = uint8(1);%uint8(imageResults.maskImg(imageResults.maskImg ~= 0))*(255/3*1);
-    mask(boneMask ~= 0) = uint8(2);%uint8(boneMask(boneMask ~= 0))*(255/3*2);
-    mask(metalMask ~= 0) = uint8(3);%uint8(metalMask(metalMask ~= 0))*(255/3*3);
+    mask(imageResults.maskImg ~= 0) = uint8(1);
+    mask(boneMask ~= 0) = uint8(2);
+    mask(metalMask ~= 0) = uint8(3);
 
     productMaskImg = uint8(imageResults.maskImg)*255;
     boneMaskImg = uint8(boneMask)*255;
@@ -59,6 +59,12 @@ for i = 1 : length(images)
     % [sxImgLength, sxImgWidth] = size(sxImg);
     % imwrite(sxImg, [basePath, settings.archiveImg.name, '.png'],'png');
     %imwrite(lowImg, [baseFilename, '_low.png'],'png');
+
+    % TODO: Fix the naming or remove this
+    %[width, height] = size(highImg);
+    %highImg = cat(2, padarray(highImg,[(700-width)/2 (768-height)/2],255,'both'), padarray(lowImg,[(700-width)/2 (768-height)/2],255,'both'));
+    % TODO: End
+
     [width, height] = size(highImg);
     paddedHighImg = padarray(highImg,[(700-width)/2 (768-height)/2],255,'both');
     imwrite(paddedHighImg, [basePath, 'images\', settings.archiveImg.name],'png');
