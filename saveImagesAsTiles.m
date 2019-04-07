@@ -11,7 +11,7 @@ settings.boneDetection.volume = 1000;
 
 
 images = getNamesOfTifImages(settings.archiveImg.path);
-for i = 1 : length(images)
+for i = 2 : 2 %length(images)
     settings.archiveImg.name = images{i};
     
 
@@ -202,3 +202,8 @@ function [lowImg, highImg] = loadOneImage(settings)
     lowImg  = sxImg(1:end-mod(sxImgLength, 2), 1:sxImgWidth/2);
     highImg = sxImg(1:end-mod(sxImgLength, 2), sxImgWidth/2+1:end);
 end
+
+% Plot mask on image
+% image = imread('C:\School\Scripts\TestData\images\MAGNA_56_-1CL_0.446517kg.tif');
+% mask = imread('C:\School\Scripts\TestData\masks\MAGNA_56_-1CL_0.446517kg.tif');
+% imagesc(cat(3,mat2gray(image),mat2gray(image),mat2gray(image)+mat2gray(mask)))
