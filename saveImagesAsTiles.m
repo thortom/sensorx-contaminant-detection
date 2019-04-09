@@ -10,10 +10,16 @@ settings.boneDetection.volumeThreshold = 50;
 settings.boneDetection.volume = 1000;
 
 
-images = getNamesOfTifImages(settings.archiveImg.path);
-for i = 2 : 2 %length(images)
-    settings.archiveImg.name = images{i};
-    
+fileID = fopen('C:\School\Myndir\All_In_Folder_With_Calibration\allImages_07042019.txt','r');
+data = textscan(fileID,'%s');
+images = data{1};
+fclose(fileID);
+%images = getNamesOfTifImages(settings.archiveImg.path);
+for i = 1218 : length(images)
+    [filepath,name,ext] = fileparts(images{i});
+    settings.archiveImg.name = [name, ext];% images{i};
+    settings.archiveImg.path = filepath;
+    settings.calData.path = [filepath, '/calibration_data/'];
 
     [lowImg, highImg] = loadOneImage(settings);
     
@@ -21,11 +27,6 @@ for i = 2 : 2 %length(images)
     
     boneMask = imageResults.boneDetection.normalBoneMask + imageResults.boneDetection.fanBoneMask + imageResults.boneDetection.volumeBoneMask;
     metalMask = imageResults.boneDetection.metalMask;
-    
-    bonesDetected = countDefects(boneMask);
-    metalDetected = countDefects(metalMask);
-
-    settings.archiveImg.name, bonesDetected, metalDetected
     
     plastImg = uint8(imageResults.plasticImg)*(255/20);
     alImg = uint8(imageResults.alImg)*(255/1);
@@ -40,7 +41,48 @@ for i = 2 : 2 %length(images)
     productMaskImg = uint8(imageResults.maskImg)*255;
     boneMaskImg = uint8(boneMask)*255;
     metalMaskImg = uint8(metalMask)*255;
-
+    
+    
+    % TODO: If there is both metal and bone detected then I need to verify
+    % the image if the metal is really metal
+    bonesDetected = countDefects(boneMask);
+    metalDetected = countDefects(metalMask);
+    
+    if ((bonesDetected > 0) && (metalDetected > 0) || (metalDetected > 0))
+        [filepath,'/',name,ext], bonesDetected, metalDetected
+        if (bonesDetected > 0) && (metalDetected > 0)
+            "Metal and bone in the same image", i
+        elseif (metalDetected > 0)
+            "Metal detected", i
+        end
+        
+        figure('units','normalized','outerposition',[0 0 1 1]);
+        title('Image name')
+        subplot(2,2,1);
+        imagesc(imageResults.plasticImg); colorbar
+        title('Plastic image');
+        subplot(2,2,2);
+        imagesc(imageResults.alImg); colorbar
+        title('Alumimium image');
+        subplot(2,2,3);
+        imagesc(boneMaskImg);
+        title('boneMask image');
+        subplot(2,2,4);
+        imagesc(metalMaskImg);
+        title('metalMask image');
+        sgtitle([replace(settings.archiveImg.name, '_', ' '), ' nr:', int2str(i)])
+        
+        prompt = {"Remove all metal?"}; %,'Enter colormap name:'};
+        dlgtitle = "Input";
+        dims = [1 35];
+        definput = {'yes'};
+        answer = inputdlg(prompt,dlgtitle,dims,definput);
+        if strcmpi(answer{1}, 'yes') % Then remove any metal
+            mask(metalMask ~= 0) = uint8(2);
+        end
+        close all;
+        %pause;
+    end
     % metalMaskImg(metalMaskImg ~= 0)
 
     basePath = ['C:\School\Scripts\out\'];
@@ -48,11 +90,6 @@ for i = 2 : 2 %length(images)
     %imwrite(alImg, [baseFilename, '_aluminium.png'],'png');
     %imwrite(lowImg, [baseFilename, '_low.png'],'png');
     %imwrite(highImg, [baseFilename, '_high.png'],'png');
-    
-    % TODO: If there is both metal and bone detected then I need to verify
-    % the image if the metal is really metal
-%     lowImg = lowImg * 255/max(lowImg, [], 'all');
-%     highImg = highImg * 255/max(highImg, [], 'all');
 
     % %% Load SX Image, contains both low and high energy images
     % sxImg = double(imread(fullfile(settings.archiveImg.path, settings.archiveImg.name)));
@@ -60,16 +97,13 @@ for i = 2 : 2 %length(images)
     % imwrite(sxImg, [basePath, settings.archiveImg.name, '.png'],'png');
     %imwrite(lowImg, [baseFilename, '_low.png'],'png');
 
-    % TODO: Fix the naming or remove this
-    %[width, height] = size(highImg);
-    %highImg = cat(2, padarray(highImg,[(700-width)/2 (768-height)/2],255,'both'), padarray(lowImg,[(700-width)/2 (768-height)/2],255,'both'));
-    % TODO: End
-
     [width, height] = size(highImg);
-    paddedHighImg = padarray(highImg,[(700-width)/2 (768-height)/2],255,'both');
-    imwrite(paddedHighImg, [basePath, 'images\', settings.archiveImg.name],'png');
-    %imwrite(imageResults.lowImgNormReg, [baseFilename,'_lowImgNormReg.png'],'png');
-    %imwrite(imageResults.highImgNorm, [baseFilename,'_highImgNorm.png'],'png');
+    paddedImg = cat(3, padarray(highImg,[(700-width)/2 (768-height)/2],255,'both'), padarray(lowImg,[(700-width)/2 (768-height)/2],255,'both'), ones(700, 768)); % Error: PNG image data must be either MxN or MxNx3.
+
+    % [width, height] = size(highImg);
+    % paddedHighImg = padarray(highImg,[(700-width)/2 (768-height)/2],255,'both');
+    imwrite(paddedImg, [basePath, 'images\', settings.archiveImg.name],'png');
+
     [width, height] = size(mask);
     paddedMask = padarray(mask,[(700-width)/2 (768-height)/2],0,'both');
     imwrite(paddedMask, [basePath, 'masks\', settings.archiveImg.name],'png');
