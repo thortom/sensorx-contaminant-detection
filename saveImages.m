@@ -14,7 +14,7 @@ fileID = fopen('/home/thor/School/Myndir/All_In_Folder_With_Calibration/allImage
 data = textscan(fileID,'%s');
 images = data{1};
 fclose(fileID);
-for i = 2443 : 2443 %length(images)
+for i = 1 : length(images)
     [filepath,name,ext] = fileparts(images{i});
     [filepath,name,ext]
     settings.archiveImg.name = [name, ext];% images{i};
@@ -23,8 +23,10 @@ for i = 2443 : 2443 %length(images)
 
     [lowImg, highImg] = loadOneImage(settings);
 
+    tic
     [numResults, imageResults] = findBonesOneSXImage(settings);
-
+    toc
+    
     boneMask = imageResults.boneDetection.normalBoneMask + imageResults.boneDetection.fanBoneMask + imageResults.boneDetection.volumeBoneMask;
     metalMask = imageResults.boneDetection.metalMask;
 
@@ -46,45 +48,45 @@ for i = 2443 : 2443 %length(images)
     metalDetected = countDefects(metalMask);
 
     % Get users verification of metal correctness
-    if (((bonesDetected > 0) && (metalDetected > 0)) || (metalDetected > 0))
-        fullFileName = [filepath,'/',name,ext];
-        if (bonesDetected > 0) && (metalDetected > 0)
-            infoString = "Metal and bone in the same image";
-        elseif (metalDetected > 0)
-            infoString = "Metal detected";
-        end
-        fprintf('\n%s\nNumbBones: %s, NumbMetals: %s\n%s\nIndex: %s\n', ...
-                            [fullFileName, bonesDetected, metalDetected, infoString, i])
-
-        figure('units','normalized','outerposition',[0 0 1 1]);
-        title('Image name')
-        subplot(2,2,1);
-        imagesc(imageResults.plasticImg); colorbar
-        title('Plastic image');
-        subplot(2,2,2);
-        imagesc(imageResults.alImg); colorbar
-        title('Alumimium image');
-        subplot(2,2,3);
-        imagesc(boneMaskImg);
-        title('boneMask image');
-        subplot(2,2,4);
-        imagesc(metalMaskImg);
-        title('metalMask image');
-        sgtitle([replace(settings.archiveImg.name, '_', ' '), ' nr:', int2str(i)])
-
-        prompt = {"Mark metal as: "}; %,'Enter colormap name:'};
-        dlgtitle = "Input";
-        dims = [1 35];
-        definput = {'meat'};
-        answer = inputdlg(prompt,dlgtitle,dims,definput);
-        if strcmpi(answer{1}, 'meat') % Then remove any metal
-            mask(metalMask ~= 0) = uint8(1);
-        elseif strcmpi(answer{1}, 'bone')
-            mask(metalMask ~= 0) = uint8(2);
-        end
-        close all;
-        %pause;
-    end
+%     if (((bonesDetected > 0) && (metalDetected > 0)) || (metalDetected > 0))
+%         fullFileName = [filepath,'/',name,ext];
+%         if (bonesDetected > 0) && (metalDetected > 0)
+%             infoString = "Metal and bone in the same image";
+%         elseif (metalDetected > 0)
+%             infoString = "Metal detected";
+%         end
+%         fprintf('\n%s\nNumbBones: %s, NumbMetals: %s\n%s\nIndex: %s\n', ...
+%                             [fullFileName, bonesDetected, metalDetected, infoString, i])
+% 
+%         figure('units','normalized','outerposition',[0 0 1 1]);
+%         title('Image name')
+%         subplot(2,2,1);
+%         imagesc(imageResults.plasticImg); colorbar
+%         title('Plastic image');
+%         subplot(2,2,2);
+%         imagesc(imageResults.alImg); colorbar
+%         title('Alumimium image');
+%         subplot(2,2,3);
+%         imagesc(boneMaskImg);
+%         title('boneMask image');
+%         subplot(2,2,4);
+%         imagesc(metalMaskImg);
+%         title('metalMask image');
+%         sgtitle([replace(settings.archiveImg.name, '_', ' '), ' nr:', int2str(i)])
+% 
+%         prompt = {"Mark metal as: "}; %,'Enter colormap name:'};
+%         dlgtitle = "Input";
+%         dims = [1 35];
+%         definput = {'meat'};
+%         answer = inputdlg(prompt,dlgtitle,dims,definput);
+%         if strcmpi(answer{1}, 'meat') % Then remove any metal
+%             mask(metalMask ~= 0) = uint8(1);
+%         elseif strcmpi(answer{1}, 'bone')
+%             mask(metalMask ~= 0) = uint8(2);
+%         end
+%         close all;
+%         %pause;
+%     end
 
     basePath = ['/home/thor/School/Scripts/out/'];
     imageName = [basePath, 'images/', settings.archiveImg.name, 'f'];
