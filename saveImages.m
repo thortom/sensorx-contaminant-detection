@@ -140,3 +140,4 @@ end
 % image = imread('C:\School\Scripts\TestData\images\MAGNA_56_-1CL_0.446517kg.tif');
 % mask = imread('C:\School\Scripts\TestData\masks\MAGNA_56_-1CL_0.446517kg.tif');
 % imagesc(cat(3,mat2gray(image),mat2gray(image),mat2gray(image)+mat2gray(mask)))
+% imagesc(imresize(image, 0.5))

@@ -1,23 +1,22 @@
 clear all;
 close all;
 
-path(path,'C:\Work\GIT\testscripts\');
+path(path,'/home/thor/GIT/testscripts');
 
-settings.archiveImg.path = 'C:\School\Myndir\Spruce_20190326\1530';
+settings.archiveImg.path = '/home/thor/Work/Skovde/Myndir/metal/08052019/';
 %settings.archiveImg.name = 'MAGNA_4_86.0254CL_2.76924kg.tif';
-settings.calData.path = 'C:\School\Myndir\Spruce_20190326\calibration_data';
-settings.boneDetection.angle = 0;
-%settings.boneDetection.normalThreshold = 16;
-%settings.boneDetection.fanThreshold = 12;
+settings.calData.path = '/home/thor/Work/Skovde/Myndir/calibration_data_06052019';
+settings.boneDetection.angle = 91.31;
+%settings.boneDetection.normalThreshold = 90;
+%settings.boneDetection.fanThreshold = 60;
 %settings.boneDetection.normalArea = 15;
 %settings.boneDetection.fanArea = 55;
-settings.boneDetection.metalThreshold = 1200;
-settings.boneDetection.volumeThreshold = 11;
-settings.boneDetection.volume = 13;
-
+settings.boneDetection.metalThreshold = 500;
+settings.boneDetection.volumeThreshold = 90;
+settings.boneDetection.volume = 50;
 
 images = getNamesOfTifImages(settings.archiveImg.path);
-for i = 1 : 1%length(images)
+for i = 1 : length(images)
     settings.archiveImg.name = images{i};
     
 
@@ -42,10 +41,10 @@ for i = 1 : 1%length(images)
     imagesc(imageResults.boneDetection.combImg,[min(min(imageResults.boneDetection.combImg)), max(max(imageResults.boneDetection.combImg))]); colorbar
     title('Combined image');
     subplot(2,2,3);
-    imagesc(mask); % colorbar
+    imagesc(mask); colorbar
     title('Plastic image');
     subplot(2,2,4);
-    imagesc(imageResults.alImg,[min(min(imageResults.alImg)), max(max(imageResults.alImg))]); colorbar
+    imagesc(imageResults.alImg); colorbar%,[min(min(imageResults.alImg)), max(max(imageResults.alImg))]); colorbar
     title('Aluminium image');
     sgtitle(replace(settings.archiveImg.name, '_', ' '))
 %     subplot(2,2,3);
@@ -54,8 +53,7 @@ for i = 1 : 1%length(images)
 %     subplot(2,2,4);
 %     imagesc(imageResults.alImg,[min(min(imageResults.alImg)), max(max(imageResults.alImg))]); colorbar
 %     title('Aluminium image');
-%     sgtitle(replace(settings.archiveImg.name, '_', ' '))
 
     % imtool(imageResults.boneDetection.combImg,[]);
-    %pause;
+    pause;
 end
